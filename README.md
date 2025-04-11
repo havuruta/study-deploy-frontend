@@ -1,16 +1,5 @@
-# Study Deploy Frontend
+# Vue 3 + TypeScript + Vite
 
-Vue 3 + Vite 기반 프론트엔드입니다.  
-CI/CD 및 Cafe24 서버 자동 배포 실습용으로 사용됩니다.
+This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
 
-## 기술 스택
-
-- Vue 3
-- TypeScript
-- Vite
-
-## 로컬 실행
-
-```bash
-npm install
-npm run dev
+Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
