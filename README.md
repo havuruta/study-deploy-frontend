@@ -1,5 +1,18 @@
-# Vue 3 + TypeScript + Vite
+## `study-deploy-frontend` – JWT 인증 프론트(Vue)
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+### 개요
+Vue + Vite 기반의 프론트엔드 애플리케이션.  
+JWT 기반 인증 흐름을 통해 로그인 상태를 관리하며 백엔드와 연동합니다.
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+### 주요 기능
+- 로그인 / 회원가입 폼
+- 로그인 시 JWT Access/Refresh 토큰 저장
+- `/users/info` 호출 시 토큰 자동 전송 및 사용자 정보 렌더링
+- 토큰 만료 또는 인증 실패 시 자동 로그아웃 처리 예정
+
+### 기술 스택
+- Vue 3 (Composition API)
+- Vite
+- Axios
+- TypeScript (optional)
+- Pinia (선택적 상태 관리)
