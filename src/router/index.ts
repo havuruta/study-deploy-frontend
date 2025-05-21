@@ -1,5 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
 // 동적 라우트 정의
 const routes: RouteRecordRaw[] = [
@@ -21,13 +22,19 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/profile',
     name: 'Profile',
-    component: () => import('../pages/Profile.vue')
+    component: () => import('../pages/Profile.vue'),
+    meta: { requiresAuth: true }
   },
   {
     path: '/user-info',
     name: 'user-info',
     component: () => import('../pages/UserInfo.vue'),
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/test',
+    name: 'test',
+    component: () => import('../pages/Test.vue')
   }
 ]
 
@@ -38,17 +45,23 @@ const router = createRouter({
 })
 
 // 네비게이션 가드
-router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token')
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
-
-  if (requiresAuth && !token) {
-    next('/login')
-  } else if (!requiresAuth && token && (to.path === '/login' || to.path === '/signup')) {
-    next('/user-info')
-  } else {
-    next()
+router.beforeEach(async (to, from, next) => {
+  const authStore = useAuthStore()
+  
+  if (to.meta.requiresAuth) {
+    try {
+      await authStore.checkAuth()
+      if (!authStore.isAuthenticated) {
+        next({ name: 'login', query: { message: '로그인이 필요합니다.' } })
+        return
+      }
+    } catch (error) {
+      next({ name: 'login', query: { message: '인증에 실패했습니다.' } })
+      return
+    }
   }
+  
+  next()
 })
 
 // 라우터 에러 핸들링

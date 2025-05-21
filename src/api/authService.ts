@@ -12,45 +12,18 @@ export interface RegisterRequest {
   gender: string;
 }
 
-export interface TokenResponse {
-  data: {
-    grantType: string;
-    accessToken: string;
-    refreshToken: string;
-    accessTokenExpiresIn: number;
-  };
-}
-
-export interface UserInfoResponse {
-  data: {
-    email: string;
-    nickname: string;
-    gender: 'MALE' | 'FEMALE';
-    createdAt: string;
-  };
-}
-
 export interface UserInfo {
+  id: number;
   email: string;
-  nickname: string;
-  gender: 'MALE' | 'FEMALE';
-  createdAt: string;
+  name: string;
+  gender: string;
 }
 
 export const authService = {
-  async login(credentials: { email: string; password: string }) {
+  async login(credentials: LoginRequest) {
     try {
-      const response = await axios.post<TokenResponse>('/auth/login', credentials);
-      console.log('로그인 응답:', response.data);
-      
-      const token = response.data.data?.accessToken;
-      console.log('추출된 토큰:', token);
-      
-      if (token) {
-        localStorage.setItem('token', token);
-      }
-      
-      return response.data;
+      await axios.post('/auth/login', credentials);
+      return true;
     } catch (error) {
       console.error('로그인 실패:', error);
       throw error;
@@ -59,50 +32,34 @@ export const authService = {
 
   async register(data: RegisterRequest) {
     try {
-      const response = await axios.post<TokenResponse>('/auth/signup', data);
-      console.log('회원가입 응답:', response.data);
-      const token = response.data.data?.accessToken;
-      console.log('저장할 토큰:', token);
-      if (token) {
-        localStorage.setItem('token', token);
-      }
-      return response.data;
+      await axios.post('/auth/signup', data);
+      return true;
     } catch (error) {
       console.error('회원가입 실패:', error);
       throw error;
     }
   },
 
-  logout: async () => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        await axios.post('/auth/logout', {
-          accessToken: token
-        });
-      } catch (error) {
-        console.error('로그아웃 실패:', error);
-      }
+  async logout() {
+    try {
+      await axios.post('/auth/logout', {
+        accessToken: document.cookie.split('; ').find(row => row.startsWith('accessToken='))?.split('=')[1],
+        refreshToken: document.cookie.split('; ').find(row => row.startsWith('refreshToken='))?.split('=')[1]
+      });
+      window.location.href = '/login';
+    } catch (error) {
+      console.error('로그아웃 실패:', error);
+      throw error;
     }
-    localStorage.removeItem('token');
-    window.location.href = '/login';
   },
 
   async getCurrentUser() {
-    const token = localStorage.getItem('token');
-    console.log('사용할 토큰:', token);
-    if (!token) {
-      throw new Error('No token found');
+    try {
+      const response = await axios.get('/users/info');
+      return response.data;
+    } catch (error) {
+      console.error('사용자 정보 조회 실패:', error);
+      throw error;
     }
-    const response = await axios.get<UserInfoResponse>('/users/info');
-    return response.data;
-  },
-
-  isAuthenticated: (): boolean => {
-    return !!localStorage.getItem('token');
-  },
-
-  getToken() {
-    return localStorage.getItem('token');
   }
 }; 
