@@ -152,7 +152,7 @@ const handleSubmit = async () => {
     isLoading.value = false
   }
 }
-</script>
+</script> 
 
 <style scoped>
 .profile {

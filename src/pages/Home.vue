@@ -36,7 +36,7 @@ const formatDate = (dateString?: string) => {
     day: 'numeric'
   })
 }
-</script>
+</script> 
 
 <style scoped>
 .home {

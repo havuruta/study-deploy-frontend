@@ -51,7 +51,7 @@ const handleSubmit = async () => {
   isLoading.value = true
   
   try {
-    await authStore.login(form.value)
+    await authStore.login(form.value.email, form.value.password)
     router.push('/')
   } catch (e) {
     if (axios.isAxiosError(e)) {

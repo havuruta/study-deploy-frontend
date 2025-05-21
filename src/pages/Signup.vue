@@ -42,6 +42,13 @@
       </div>
       <button type="submit">회원가입</button>
     </form>
+    <!-- 모달 -->
+    <div v-if="showModal" class="modal">
+      <div class="modal-content">
+        <p>{{ modalMessage }}</p>
+        <button @click="closeModal">닫기</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -59,12 +66,29 @@ const form = ref({
   nickname: '',
   gender: 'MALE'
 })
+const showModal = ref(false)
+const modalMessage = ref('')
+const closeModal = () => {
+  showModal.value = false
+}
+const openModal = (message: string) => {
+  modalMessage.value = message
+  showModal.value = true
+}
 
 const handleSubmit = async () => {
   try {
-    await authStore.register(form.value)
+    const registerData = {
+      email: form.value.email,
+      password: form.value.password,
+      nickname: form.value.nickname,
+      gender: form.value.gender
+    }
+    await authStore.register(registerData)
     router.push('/login')
-  } catch (error) {
+  } catch (error: any) {
+    modalMessage.value = error.response?.data?.message || '회원가입에 실패했습니다.'
+    showModal.value = true
     console.error('회원가입 실패:', error)
   }
 }
@@ -75,6 +99,25 @@ const handleSubmit = async () => {
   max-width: 400px;
   margin: 0 auto;
   padding: 20px;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
 }
 
 .form-group {
