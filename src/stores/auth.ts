@@ -1,30 +1,25 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { authService } from '@/api/authService'
-import router from '@/router'
 
 interface User {
+  id: number
   email: string
-  nickname: string
-  gender: 'MALE' | 'FEMALE'
-  createdAt: string
+  name: string
+  gender: string
 }
 
 export const useAuthStore = defineStore('auth', () => {
+  const router = useRouter()
   const user = ref<User | null>(null)
-  const token = ref<string | null>(null)
   const isAuthenticated = ref(false)
   const isLoading = ref(false)
   const error = ref<string | null>(null)
 
-  const setToken = (newToken: string) => {
-    token.value = newToken
-    isAuthenticated.value = true
-    localStorage.setItem('token', newToken)
-  }
-
-  const setUser = (newUser: User) => {
-    user.value = newUser
+  const setUser = (userData: User | null) => {
+    user.value = userData
+    isAuthenticated.value = !!userData
   }
 
   const setError = (message: string) => {
@@ -34,74 +29,52 @@ export const useAuthStore = defineStore('auth', () => {
     }, 3000)
   }
 
-  const login = async (credentials: { email: string; password: string }) => {
-    isLoading.value = true
-    error.value = null
+  const login = async (email: string, password: string) => {
     try {
-      const response = await authService.login(credentials)
-      setToken(response.data.accessToken)
-      const userInfo = await authService.getCurrentUser()
-      setUser(userInfo.data)
-      return userInfo.data
-    } catch (error) {
-      setError('로그인에 실패했습니다. 다시 시도해주세요.')
-      throw error
+      isLoading.value = true
+      const response = await authService.login({ email, password })
+      await checkAuth()
+      router.push('/')
+    } catch (err: any) {
+      setError(err.response?.data?.message || '로그인에 실패했습니다.')
     } finally {
       isLoading.value = false
     }
   }
 
-  const register = async (userData: {
-    email: string
-    password: string
-    nickname: string
-    gender: 'MALE' | 'FEMALE'
-  }) => {
-    isLoading.value = true
-    error.value = null
+  const register = async (data: { email: string; password: string; nickname: string; gender: string }) => {
     try {
-      const response = await authService.register(userData)
-      setToken(response.data.accessToken)
-      const userInfo = await authService.getCurrentUser()
-      setUser(userInfo.data)
-      return userInfo.data
-    } catch (error) {
-      setError('회원가입에 실패했습니다. 다시 시도해주세요.')
-      throw error
+      isLoading.value = true
+      await authService.register(data)
+      await login(data.email, data.password)
+    } catch (err: any) {
+      setError(err.response?.data?.message || '회원가입에 실패했습니다.')
     } finally {
       isLoading.value = false
     }
   }
 
-  const logout = () => {
-    user.value = null
-    token.value = null
-    isAuthenticated.value = false
-    localStorage.removeItem('token')
-    router.push('/login')
+  const logout = async () => {
+    try {
+      await authService.logout()
+      setUser(null)
+      router.push('/login')
+    } catch (err: any) {
+      setError(err.response?.data?.message || '로그아웃에 실패했습니다.')
+    }
   }
 
   const checkAuth = async () => {
-    isLoading.value = true
-    error.value = null
     try {
-      const storedToken = localStorage.getItem('token')
-      if (storedToken) {
-        setToken(storedToken)
-        const userInfo = await authService.getCurrentUser()
-        setUser(userInfo.data)
-      }
-    } catch (error) {
-      setError('인증 확인에 실패했습니다. 다시 로그인해주세요.')
-      logout()
-    } finally {
-      isLoading.value = false
+      const response = await authService.getCurrentUser()
+      setUser(response.data)
+    } catch (err) {
+      setUser(null)
     }
   }
 
   return {
     user,
-    token,
     isAuthenticated,
     isLoading,
     error,

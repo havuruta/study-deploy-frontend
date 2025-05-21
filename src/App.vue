@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router';
-import { computed } from 'vue'
-import { authService } from './api/authService'
+import { useAuthStore } from './stores/auth';
 
-const isAuthenticated = computed(() => !!authService.getToken())
+const authStore = useAuthStore();
 
-const handleLogout = () => {
-  authService.logout()
+const handleLogout = async () => {
+  try {
+    await authStore.logout();
+  } catch (error) {
+    console.error('로그아웃 실패:', error);
+    alert('로그아웃 중 오류가 발생했습니다. 다시 시도해주세요.');
+  }
 }
 </script>
 
@@ -14,7 +18,7 @@ const handleLogout = () => {
   <div class="app">
     <nav class="nav">
       <router-link to="/">홈</router-link>
-      <template v-if="isAuthenticated">
+      <template v-if="authStore.isAuthenticated">
         <router-link to="/profile">프로필</router-link>
         <router-link to="/user-info">사용자 정보</router-link>
         <button @click="handleLogout">로그아웃</button>
