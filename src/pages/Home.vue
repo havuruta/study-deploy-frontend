@@ -10,11 +10,13 @@
       <div class="button-group">
         <router-link to="/profile" class="button">프로필 수정</router-link>
         <router-link to="/user-info" class="button">상세 정보</router-link>
+        <router-link to="/test" class="button test-button">인증 테스트</router-link>
       </div>
     </div>
     <div v-else class="auth-buttons">
       <router-link to="/login" class="button">로그인</router-link>
       <router-link to="/signup" class="button">회원가입</router-link>
+      <router-link to="/test" class="button test-button">인증 테스트</router-link>
     </div>
   </div>
 </template>
@@ -86,5 +88,13 @@ const formatDate = (dateString?: string) => {
 
 .button:hover {
   background-color: var(--secondary-color);
+}
+
+.test-button {
+  background-color: #2196F3;
+}
+
+.test-button:hover {
+  background-color: #1976D2;
 }
 </style> 
