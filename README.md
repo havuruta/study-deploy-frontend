@@ -1,18 +1,79 @@
-## `study-deploy-frontend` – JWT 인증 프론트(Vue)
+## `study-deploy-frontend` – Vue.js 기반 인증 프론트엔드
 
 ### 개요
-Vue + Vite 기반의 프론트엔드 애플리케이션.  
-JWT 기반 인증 흐름을 통해 로그인 상태를 관리하며 백엔드와 연동합니다.
+Vue.js 기반 프론트엔드 애플리케이션.  
+JWT 토큰 기반 인증 시스템을 구현하여 사용자 인증 및 보호된 리소스 접근을 관리합니다.
 
 ### 주요 기능
-- 로그인 / 회원가입 폼
-- 로그인 시 JWT Access/Refresh 토큰 저장
-- `/users/info` 호출 시 토큰 자동 전송 및 사용자 정보 렌더링
-- 토큰 만료 또는 인증 실패 시 자동 로그아웃 처리 예정
+- 회원가입 및 로그인 페이지
+- JWT 토큰 기반 인증 상태 관리
+- 보호된 라우트 접근 제어
+- 사용자 정보 조회 및 관리
+- 토큰 갱신 및 자동 로그아웃
+
+### 인증 시스템 상세
+1. **토큰 관리**
+   - httpOnly 쿠키를 통한 안전한 토큰 저장
+   - 토큰 만료 시 자동 갱신
+   - 로그아웃 시 토큰 무효화
+
+2. **인증 프로세스**
+   - 로그인: 백엔드로부터 토큰 수신 및 쿠키 저장
+   - 토큰 갱신: 만료 시 자동 갱신 요청
+   - 로그아웃: 토큰 무효화 및 쿠키 삭제
+
+3. **보안 기능**
+   - XSS 방지를 위한 httpOnly 쿠키 사용
+   - CSRF 방지를 위한 SameSite 쿠키 설정
+   - 보호된 라우트 접근 제어
+   - 자동 로그아웃 기능
 
 ### 기술 스택
-- Vue 3 (Composition API)
-- Vite
-- Axios
-- TypeScript (optional)
-- Pinia (선택적 상태 관리)
+- Vue.js 3.x
+- Vue Router 4.x
+- Pinia (상태 관리)
+- Axios (HTTP 클라이언트)
+- TypeScript
+- Vite (빌드 도구)
+
+### 페이지 구성
+1. **인증 관련**
+   - `/login`: 로그인 페이지
+   - `/signup`: 회원가입 페이지
+   - `/test`: 인증 테스트 페이지
+
+2. **사용자 관련**
+   - `/main`: 메인 페이지 (인증 필요)
+   - `/user-info`: 사용자 정보 페이지 (인증 필요)
+
+### API 통신
+- Axios 인스턴스를 통한 HTTP 요청 관리
+- 인터셉터를 통한 토큰 자동 갱신
+- 에러 핸들링 및 응답 처리
+
+### 보안 설정
+- 모든 API 요청은 HTTPS 통신 사용
+- 쿠키는 Secure 플래그 설정
+- SameSite=None 설정으로 크로스 사이트 요청 허용
+- httpOnly 플래그로 JavaScript 접근 차단
+
+### 개발 환경 설정
+1. **필수 요구사항**
+   - Node.js 16.x 이상
+   - npm 또는 yarn
+
+2. **설치 및 실행**
+   ```bash
+   # 의존성 설치
+   npm install
+
+   # 개발 서버 실행
+   npm run dev
+
+   # 프로덕션 빌드
+   npm run build
+   ```
+
+3. **환경 변수**
+   - `VITE_API_BASE_URL`: 백엔드 API 기본 URL
+   - `VITE_APP_TITLE`: 애플리케이션 제목
